@@ -1,6 +1,6 @@
 package karazinscalausersgroup.routing
 
-import argonaut.Json
+import argonaut.{Parse, Json}
 import karazinscalausersgroup.routing._
 import karazinscalausersgroup.routing.conversions._
 import org.scalatest.{Matchers, FlatSpec}
