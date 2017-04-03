@@ -98,6 +98,37 @@ See [examples](src/test/karazinscalausersgroup/flow/examples) for more complete 
 
 Routing Hello World
 -------
+```
+  import argonaut.{Parse, Json}
+  import scala.language.implicitConversions
+  import karazinscalausersgroup.routing._
+  import karazinscalausersgroup.routing.conversions._
+
+  implicit def stringToJson(str: String): Json =
+    Parse.parseOption(str).get
+
+  // Rout messages based on `key` value
+  val flow = new Extractor[Json, String] {
+    def `extract property from`(message: Json): String =
+      message.field("key").get.stringOrEmpty.toString
+  }
+
+  // Your custom router
+  val router = new Router[Json, String, String] {}
+
+  Consume / router / flow / "one"   /> { message => "flow one" }
+  Consume / router / flow / "two"   /> { message => "flow two" }
+  Consume / router / flow / "three" /> { message => "flow three" }
+
+  // Processing messages depends on `key` value
+  val `one message`: Json = """{"a": "1", "b": "2", "c": "3", "key": "one"}""".stripMargin
+  val `two message`: Json = """{"a": "1", "b": "2", "c": "3", "key": "two"}""".stripMargin
+  val `three message`: Json = """{"a": "1", "b": "2", "c": "3", "key": "three"}""".stripMargin
+
+  assert((router process `one message`) == "flow one")
+  assert((router process `two message`) == "flow two")
+  assert((router process `three message`) == "flow three")
+```
 
 See [examples](src/test/karazinscalausersgroup/routing/examples) for more complete examples.
 
