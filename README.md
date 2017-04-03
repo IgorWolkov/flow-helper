@@ -4,7 +4,7 @@ Flow Helper is a simple library inspired by [Finagle](https://twitter.github.io/
 and [Finch](https://github.com/finagle/finch) (v < 0.7.0).
 
 The use case of this library is to restrict your self by pipe-line
-codding and make you code fine grained and easy to read.
+codding and make your code fine grained and easy to read.
 
 Installation
 -------
