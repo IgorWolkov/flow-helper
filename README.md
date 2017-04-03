@@ -21,17 +21,24 @@ Flow Hello World
   trait ValidatedRequest
   trait Order
 
-  object Authorize extends Service[Request, AuthorizedRequest] {
-    override def apply(request: Request): Future[AuthorizedRequest] = ???
+  // Your custom services
+  object services {
+
+    object Authorize extends Service[Request, AuthorizedRequest] {
+      override def apply(request: Request): Future[AuthorizedRequest] = ???
+    }
+
+    object RequestToOrder extends Service[ValidatedRequest, Order] {
+      override def apply(request: ValidatedRequest): Future[Order] = ???
+    }
+
+    object Validate extends Service[AuthorizedRequest, ValidatedRequest] {
+      override def apply(request: AuthorizedRequest): Future[ValidatedRequest] = ???
+    }
+
   }
 
-  object RequestToOrder extends Service[ValidatedRequest, Order] {
-    override def apply(request: ValidatedRequest): Future[Order] = ???
-  }
-
-  object Validate extends Service[AuthorizedRequest, ValidatedRequest] {
-    override def apply(request: AuthorizedRequest): Future[ValidatedRequest] = ???
-  }
+  import services._
 
   val `order flow` = Authorize --> Validate --> RequestToOrder
 ```
@@ -52,6 +59,7 @@ Flow Reach Example
   type Req[T] = Either[BusinessError, T]
   type Rep[T] = Either[BusinessError, T]
 
+  // Your custom services
   object services {
 
     object Authorize extends
