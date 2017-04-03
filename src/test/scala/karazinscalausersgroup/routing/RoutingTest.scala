@@ -1,7 +1,9 @@
 package karazinscalausersgroup.routing
 
+import argonaut.Json
 import karazinscalausersgroup.routing._
 import karazinscalausersgroup.routing.conversions._
+import org.scalatest.{Matchers, FlatSpec}
 
 import scala.language.implicitConversions
 
