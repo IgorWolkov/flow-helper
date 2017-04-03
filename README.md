@@ -36,7 +36,57 @@ Flow Hello World
   val `order flow` = Authorize --> Validate --> RequestToOrder
 ```
 
+Flow Reach Example
+-------
+```scala
+  import scala.concurrent.Future
+  import karazinscalausersgroup.flow.Service
+
+  trait Request
+  trait AuthorizedRequest
+  trait ValidatedRequest
+  trait User
+
+  trait BusinessError
+
+  type Req[T] = Either[BusinessError, T]
+  type Rep[T] = Either[BusinessError, T]
+
+  object services {
+
+    object Authorize extends
+      Service[Req[Request], Rep[AuthorizedRequest]] {
+      override def apply(request: Req[Request]): Future[Either[BusinessError, AuthorizedRequest]] = ???
+    }
+
+    object Validate extends Service[Req[AuthorizedRequest], Rep[ValidatedRequest]] {
+      override def apply(request: Either[BusinessError, AuthorizedRequest]): Future[Either[BusinessError, ValidatedRequest]] = ???
+    }
+
+    object ProcessUser extends Service[Req[ValidatedRequest], Rep[User]] {
+      override def apply(request: Either[BusinessError, ValidatedRequest]): Future[Either[BusinessError, User]] = ???
+    }
+
+    object Recover extends Service[BusinessError, BusinessError] {
+      override def apply(request: BusinessError): Future[BusinessError] = ???
+    }
+
+    object LogError extends Service[BusinessError, BusinessError] {
+      override def apply(request: BusinessError): Future[BusinessError] = ???
+    }
+  }
+
+  import services._
+
+  val `preparing flow` =
+    (Authorize --> Validate) `handle errors with` (LogError --> Recover)
+
+  val `business flow` = `preparing flow` --> ProcessUser
+```
+
 See [examples](src/test/karazinscalausersgroup/flow/examples) for more complete examples.
+
+
 
 Routing Hello World
 -------
