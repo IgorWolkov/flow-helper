@@ -98,7 +98,7 @@ See [examples](src/test/karazinscalausersgroup/flow/examples) for more complete 
 
 Routing Hello World
 -------
-```
+```scala
   import argonaut.{Parse, Json}
   import scala.language.implicitConversions
   import karazinscalausersgroup.routing._
