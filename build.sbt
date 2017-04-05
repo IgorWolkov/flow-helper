@@ -4,6 +4,8 @@ version := "0.1.0"
 
 scalaVersion := "2.11.6"
 
+enablePlugins(JavaAppPackaging)
+
 resolvers ++= Seq(
   "Maven Central Server"          at "http://repo1.maven.org/maven2",
   "TypeSafe Repository Releases"  at "http://repo.typesafe.com/typesafe/releases/",

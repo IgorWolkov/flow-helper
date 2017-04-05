@@ -1,9 +1,10 @@
-package karazinscalausersgroup.routing
+package karazinscalausersgroup
 
-import argonaut.{Parse, Json}
+import argonaut.{Json, Parse}
+import org.scalatest.{FlatSpec, Matchers}
+
 import karazinscalausersgroup.routing._
 import karazinscalausersgroup.routing.conversions._
-import org.scalatest.{Matchers, FlatSpec}
 
 import scala.language.implicitConversions
 
