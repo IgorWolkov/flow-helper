@@ -1,20 +1,19 @@
 package karazinscalausersgroup
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object flow {
 
   object Service {
 
-    implicit class ServiceOps1[Req, RepIn](service: Service[Req, RepIn]) {
+    implicit class ServiceOps1[Req, RepIn](service: Service[Req, RepIn])(implicit ec: ExecutionContext) {
       def -->[RepOut](next: Service[RepIn, RepOut]): Service[Req, RepOut] =
         new Service[Req, RepOut] {
           def apply(req: Req): Future[RepOut] = service(req) flatMap next
         }
     }
 
-    implicit class ServiceOps2[Req, Rep, Error](service: Service[Either[Error, Req], Either[Error, Rep]]) {
+    implicit class ServiceOps2[Req, Rep, Error](service: Service[Either[Error, Req], Either[Error, Rep]])(implicit ec: ExecutionContext) {
       def `handle errors with`(handler: Service[Error, Error]): Service[Either[Error, Req], Either[Error, Rep]] =
         new Service[Either[Error, Req], Either[Error, Rep]] {
           def apply(req: Either[Error, Req]): Future[Either[Error, Rep]] = {
@@ -22,7 +21,7 @@ object flow {
               case Left(error) => handler(error) map {
                 Left[Error, Rep]
               }
-              case Right(response) => Future {
+              case Right(response) => Future.successful {
                 Right[Error, Rep](response)
               }
             }
@@ -30,7 +29,7 @@ object flow {
         }
     }
 
-    implicit class ServiceOps3[Req, Rep1, Rep2, Error](service1: Service[Either[Error, Req], Either[Error, Rep1]]) {
+    implicit class ServiceOps3[Req, Rep1, Rep2, Error](service1: Service[Either[Error, Req], Either[Error, Rep1]])(implicit ec: ExecutionContext) {
       def `join with`(service2: Service[Either[Error, Req], Either[Error, Rep2]]):
       Service[Either[Error, Req], Either[Error, (Rep1, Rep2)]] =
         new Service[Either[Error, Req], Either[Error, (Rep1, Rep2)]] {
@@ -62,6 +61,17 @@ object flow {
         }
     }
 
+    implicit class ServiceOps4[Req, Inter, Error](service: Service[Either[Error, Req], Either[Error, Inter]])(implicit ec: ExecutionContext) {
+      def -->[Rep](next: Service[Inter, Either[Error, Rep]]): Service[Either[Error, Req], Either[Error, Rep]] =
+        new Service[Either[Error, Req], Either[Error, Rep]] {
+          def apply(request: Either[Error, Req]): Future[Either[Error, Rep]] = {
+            service(request) flatMap {
+              case Right(v) => next(v)
+              case Left(v)  => Future.successful { Left[Error, Rep](v) }
+            }
+          }
+        }
+    }
   }
 
   trait Service[-Req, +Rep] extends (Req => Future[Rep]) {
